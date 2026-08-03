@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "抖音资源下载",
+  "version": "1.0.0",
+  "description": "",
+  "permissions": [
+    "storage",
+    "downloads",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.douyin.com/*",
+    "https://*.douyin.com/*",
+    "https://*.douyinpic.com/*",
+    "https://*.bytedance.com/*",
+    "https://*.douyinvod.com/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_title": "抖音资源下载",
+    "default_icon": {
+      "16": "icons/doudou_16.png",
+      "48": "icons/doudou_48.png",
+      "128": "icons/doudou_128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/doudou_16.png",
+    "48": "icons/doudou_48.png",
+    "128": "icons/doudou_128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.douyin.com/*",
+        "https://*.douyin.com/*"
+      ],
+      "js": [
+        "src/downloader.js"
+      ],
+      "css": [
+        "src/downloader.css"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "build/douyin.wasm",
+        "src/inject.js",
+        "icons/*"
+      ],
+      "matches": [
+        "https://www.douyin.com/*",
+        "https://*.douyin.com/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; img-src * data: blob: filesystem:;"
+  }
+}

@@ -1,0 +1,444 @@
+/**
+ * 抖音下载助手 - 样式文件 (Doudou WASM Edition)
+ * 包含：Toast 提示框、进度条、资源下载面板与悬浮球
+ */
+
+.douyin-downloader-toast,
+.doudou-douyin-panel,
+.doudou-douyin-ball,
+.douyin-downloader-progress {
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+  box-sizing: border-box;
+}
+
+.doudou-douyin-panel *,
+.doudou-douyin-ball *,
+.douyin-downloader-progress * {
+  box-sizing: border-box;
+}
+
+/* ==================== Toast提示 ==================== */
+
+.douyin-downloader-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.88);
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 2147483647;
+  animation: fadeInOut 3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* ==================== 资源下载面板 ==================== */
+
+.doudou-douyin-panel {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  width: 380px;
+  max-height: calc(100vh - 140px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.16);
+  z-index: 2147483646;
+  color: #161823;
+  overflow: hidden;
+}
+
+.doudou-douyin-panel-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.doudou-douyin-panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #161823;
+}
+
+.doudou-douyin-panel-subtitle {
+  display: inline-block;
+  margin-top: 2px;
+  color: #fe2c55;
+  font-size: 12px;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.doudou-douyin-panel-subtitle:hover {
+  color: #ff5277;
+  text-decoration: underline;
+}
+
+.doudou-douyin-panel-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.doudou-douyin-icon-btn {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.doudou-douyin-icon-btn:hover {
+  border-color: #fe2c55;
+  background: #fff5f7;
+  color: #fe2c55;
+}
+
+.doudou-douyin-list {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.doudou-douyin-empty {
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.7;
+}
+
+.doudou-douyin-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.doudou-douyin-item:last-child {
+  margin-bottom: 0;
+}
+
+.doudou-douyin-item:hover {
+  border-color: #fe2c55;
+  background: #fff5f7;
+}
+
+.doudou-douyin-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.doudou-douyin-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #161823;
+  line-height: 1.4;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.doudou-douyin-item-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doudou-douyin-badge {
+  display: inline-block;
+  min-width: 44px;
+  border-radius: 6px;
+  background: #161823;
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.doudou-douyin-badge-note {
+  background: #24f6f0;
+  color: #161823;
+}
+
+.doudou-douyin-badge-video {
+  background: #fe2c55;
+  color: #ffffff;
+}
+
+/* ==================== 按钮 ==================== */
+
+.doudou-douyin-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  border: 1px solid #161823;
+  border-radius: 8px;
+  background: #161823;
+  color: #ffffff;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.doudou-douyin-btn:hover:not(:disabled) {
+  border-color: #fe2c55;
+  background: #fe2c55;
+}
+
+.doudou-douyin-btn:disabled,
+.doudou-douyin-btn:disabled:hover {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  background: #9ca3af !important;
+  border-color: #9ca3af !important;
+  pointer-events: none !important;
+}
+
+.doudou-douyin-btn.loading {
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  pointer-events: none !important;
+}
+
+.doudou-douyin-btn.success {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.doudou-douyin-btn.error {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.doudou-douyin-btn-send {
+  border-color: #fe2c55;
+  background: #fe2c55;
+}
+
+.doudou-douyin-btn-send:hover:not(:disabled) {
+  border-color: #ff5277;
+  background: #ff5277;
+}
+
+.doudou-douyin-btn-send:disabled,
+.doudou-douyin-btn-send:disabled:hover {
+  background: #9ca3af !important;
+  border-color: #9ca3af !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* ==================== 面板底栏 ==================== */
+
+.doudou-douyin-panel-footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #eef2f7;
+  background: #f9fafb;
+}
+
+.doudou-douyin-count {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==================== 悬浮球 ==================== */
+
+.doudou-douyin-ball {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #fe2c55;
+  background: #161823;
+  box-shadow: 0 8px 24px rgba(254, 44, 85, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2147483646;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.doudou-douyin-ball:hover {
+  transform: scale(1.08);
+  background: #fe2c55;
+}
+
+.doudou-douyin-ball-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.doudou-douyin-ball-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #fe2c55;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* ==================== 进度条 ==================== */
+
+.douyin-downloader-progress {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 300px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 14px 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  z-index: 2147483647;
+  color: #161823;
+}
+
+.douyin-downloader-progress-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #161823;
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+
+.douyin-downloader-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.douyin-downloader-progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(135deg, #fe2c55 0%, #ff5277 100%);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.douyin-downloader-progress-text {
+  font-size: 12px;
+  color: #666666;
+  text-align: center;
+}
+
+/* ==================== 深色模式支持 ==================== */
+
+@media (prefers-color-scheme: dark) {
+  .doudou-douyin-panel,
+  .douyin-downloader-progress {
+    border-color: #2e303d;
+    background: #161823;
+    color: #f3f4f6;
+  }
+
+  .doudou-douyin-panel-header,
+  .doudou-douyin-panel-footer {
+    border-color: #2e303d;
+  }
+
+  .doudou-douyin-panel-footer {
+    background: #1c1e2d;
+  }
+
+  .doudou-douyin-panel-title,
+  .doudou-douyin-item-title,
+  .douyin-downloader-progress-title {
+    color: #ffffff;
+  }
+
+  .doudou-douyin-item {
+    border-color: #2e303d;
+    background: #202230;
+  }
+
+  .doudou-douyin-item:hover {
+    border-color: #fe2c55;
+    background: #2b1f28;
+  }
+
+  .doudou-douyin-empty {
+    border-color: #3b3d4f;
+  }
+
+  .doudou-douyin-icon-btn {
+    border-color: #3b3d4f;
+    background: #202230;
+    color: #e5e7eb;
+  }
+
+  .doudou-douyin-icon-btn:hover {
+    background: #2b1f28;
+  }
+}
