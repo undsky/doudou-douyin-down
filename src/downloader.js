@@ -266,6 +266,8 @@
   let isCollapsed = false;
   let isDownloadingAll = false;
   const downloadingResources = new Set(); // 跟踪正在下载的资源 ID
+  let hasUpdate = false;
+  let updateUrl = "https://github.com/undsky/doudou-douyin-down";
 
   // ==================== 扫描调度（串行化 + 切换作品后重试） ====================
 
@@ -1037,8 +1039,57 @@
       .querySelector('[data-action="download-all"]')
       .addEventListener("click", () => downloadAll());
 
+    renderUpdateBtn();
+
     appendToBody(panelEl);
     return panelEl;
+  }
+
+  function checkVersion() {
+    fetch("https://www.undsky.com/v.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const info = data?.["doudou-douyin"];
+        if (!info || !info.version) return;
+
+        const currentVersion =
+          (typeof chrome !== "undefined" &&
+            chrome.runtime?.getManifest?.()?.version) ||
+          "1.0.2";
+
+        if (info.version !== currentVersion) {
+          hasUpdate = true;
+          if (info.url) updateUrl = info.url;
+          renderUpdateBtn();
+        }
+      })
+      .catch((err) => {
+        console.warn("[豆豆] 版本检测失败:", err);
+      });
+  }
+
+  function renderUpdateBtn() {
+    if (!panelEl || !hasUpdate) return;
+    const actionsEl = panelEl.querySelector(".doudou-douyin-panel-actions");
+    if (!actionsEl) return;
+
+    let updateBtn = actionsEl.querySelector('[data-action="update"]');
+    if (!updateBtn) {
+      const refreshBtn = actionsEl.querySelector('[data-action="refresh"]');
+      updateBtn = document.createElement("button");
+      updateBtn.className = "doudou-douyin-icon-btn";
+      updateBtn.setAttribute("data-action", "update");
+      updateBtn.title = "下载最新版本";
+      updateBtn.innerHTML = "↓";
+      updateBtn.addEventListener("click", () => {
+        window.open(updateUrl, "_blank", "noopener,noreferrer");
+      });
+      if (refreshBtn) {
+        actionsEl.insertBefore(updateBtn, refreshBtn);
+      } else {
+        actionsEl.appendChild(updateBtn);
+      }
+    }
   }
 
   function updateBallCount() {
@@ -1409,6 +1460,8 @@
 
   function init() {
     if (!location.hostname.includes('douyin.com')) return;
+    
+    checkVersion();
     
     // 初始化 WASM 核心模块
     if (typeof DouyinWasm !== "undefined" && DouyinWasm.initWasm) {

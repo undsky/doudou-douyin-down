@@ -157,22 +157,8 @@
            urlString.includes('/jingxuan/');
   }
 
-  // 拦截 Fetch - 尝试获取最原始的 fetch（可能已被抖音劫持）
-  // 如果抖音先执行，这里拿到的是被包装过的版本，需要递归查找
-  let originalFetch = window.fetch;
-
-  // 尝试从 iframe 获取未被污染的原生 fetch
-  try {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.documentElement.appendChild(iframe);
-    if (iframe.contentWindow && iframe.contentWindow.fetch) {
-      originalFetch = iframe.contentWindow.fetch.bind(window);
-    }
-    iframe.remove();
-  } catch (e) {
-    // 如果失败，使用当前的 fetch（可能已被抖音包装）
-  }
+  // 拦截 Fetch
+  const originalFetch = window.fetch;
 
   window.fetch = async function(url, options) {
     const urlString = typeof url === 'string' ? url : url?.url || '';
