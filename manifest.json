@@ -39,6 +39,10 @@
         "https://www.douyin.com/*",
         "https://*.douyin.com/*"
       ],
+      "exclude_matches": [
+        "https://creator.douyin.com/*",
+        "https://*.creator.douyin.com/*"
+      ],
       "js": [
         "src/downloader.js"
       ],

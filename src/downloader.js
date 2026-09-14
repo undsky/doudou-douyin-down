@@ -154,6 +154,11 @@
 (function() {
   'use strict';
 
+  // 创作者服务平台 (creator.douyin.com) 不加载本插件
+  if (location.hostname === 'creator.douyin.com' || location.hostname.endsWith('.creator.douyin.com')) {
+    return;
+  }
+
   if (window.douyinDownloaderInjected) return;
   window.douyinDownloaderInjected = true;
 
