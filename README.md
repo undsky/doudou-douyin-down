@@ -25,7 +25,3 @@
 | ![公众号](https://cdn.undsky.com/img/gh.jpg) | ![QQ群](https://cdn.undsky.com/img/qqqun.jpg) |
 
 ---
-
-## 关于作者
-
-[https://www.undsky.com](https://www.undsky.com)
