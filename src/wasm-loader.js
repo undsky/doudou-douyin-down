@@ -116,19 +116,21 @@
     return readStringFromMemory(instance, outPtr, outLen);
   }
 
-  async function buildDownloadPath(type, timestamp, index, ext) {
+  async function buildDownloadPath(type, mediaId, index, ext) {
     const instance = await initWasm();
     const { getInBufPtr, getOutBufPtr, buildDownloadPathWasm } = instance.exports;
 
     const inPtr = getInBufPtr ? getInBufPtr() : 1024;
     const outPtr = getOutBufPtr ? getOutBufPtr() : inPtr + 4096;
 
+    const idStr = String(mediaId || Date.now());
     const typeLen = writeStringToMemory(instance, type || "video", inPtr);
-    const extPtr = inPtr + typeLen + 16;
+    const idPtr = inPtr + typeLen + 16;
+    const idLen = writeStringToMemory(instance, idStr, idPtr);
+    const extPtr = idPtr + idLen + 16;
     const extLen = writeStringToMemory(instance, ext || "", extPtr);
 
-    const tsBigInt = BigInt(timestamp || Date.now());
-    const outLen = buildDownloadPathWasm(inPtr, typeLen, tsBigInt, index || 0, extPtr, extLen, outPtr);
+    const outLen = buildDownloadPathWasm(inPtr, typeLen, idPtr, idLen, index || 0, extPtr, extLen, outPtr);
     return readStringFromMemory(instance, outPtr, outLen);
   }
 

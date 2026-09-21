@@ -117,19 +117,21 @@
     return readStringFromMemory(instance, outPtr, outLen);
   }
 
-  async function buildDownloadPath(type, timestamp, index, ext) {
+  async function buildDownloadPath(type, mediaId, index, ext) {
     const instance = await initWasm();
     const { getInBufPtr, getOutBufPtr, buildDownloadPathWasm } = instance.exports;
 
     const inPtr = getInBufPtr ? getInBufPtr() : 1024;
     const outPtr = getOutBufPtr ? getOutBufPtr() : inPtr + 4096;
 
+    const idStr = String(mediaId || Date.now());
     const typeLen = writeStringToMemory(instance, type || "video", inPtr);
-    const extPtr = inPtr + typeLen + 16;
+    const idPtr = inPtr + typeLen + 16;
+    const idLen = writeStringToMemory(instance, idStr, idPtr);
+    const extPtr = idPtr + idLen + 16;
     const extLen = writeStringToMemory(instance, ext || "", extPtr);
 
-    const tsBigInt = BigInt(timestamp || Date.now());
-    const outLen = buildDownloadPathWasm(inPtr, typeLen, tsBigInt, index || 0, extPtr, extLen, outPtr);
+    const outLen = buildDownloadPathWasm(inPtr, typeLen, idPtr, idLen, index || 0, extPtr, extLen, outPtr);
     return readStringFromMemory(instance, outPtr, outLen);
   }
 
@@ -400,9 +402,24 @@
     return await DouyinWasm.sanitizeFilename(name);
   }
 
-  async function buildDownloadPath(type, timestamp, index = 0, ext = "") {
-    await DouyinWasm.initWasm();
-    return await DouyinWasm.buildDownloadPath(type, timestamp, index, ext);
+  async function buildDownloadPath(type, mediaId, index = 0, ext = "") {
+    try {
+      if (typeof DouyinWasm !== "undefined" && DouyinWasm.initWasm) {
+        await DouyinWasm.initWasm();
+        return await DouyinWasm.buildDownloadPath(type, mediaId, index, ext);
+      }
+    } catch (e) {
+      console.warn('[豆豆] WASM buildDownloadPath 异常，使用 JS 兜底:', e);
+    }
+    const isImage = String(type).includes('image') || String(type).includes('note');
+    const idStr = String(mediaId || Date.now());
+    let extStr = (ext || (isImage ? 'jpg' : 'mp4')).toLowerCase();
+    if (extStr.startsWith('.')) extStr = extStr.substring(1);
+    if (isImage) {
+      const idxStr = index < 10 && index >= 0 ? `0${index}` : `${index}`;
+      return `douyin_images/${idStr}_${idxStr}.${extStr}`;
+    }
+    return `douyin_video/${idStr}.${extStr}`;
   }
 
   // ==================== UI 工具函数 ====================
@@ -923,10 +940,10 @@
     const elUrl = getVideoFromElement();
     if (elUrl && resourceMap.size === 0) {
       const url = await cleanVideoUrl(elUrl);
-      const id = `video_element_${Date.now()}`;
+      const id = currentAwemeId || `video_element_${Date.now()}`;
       resourceMap.set(id, {
         id: id,
-        title: `页面播放器视频`,
+        title: currentAwemeId ? `抖音高清视频 (${currentAwemeId})` : `页面播放器视频`,
         type: 'video',
         url: url
       });
@@ -1183,9 +1200,9 @@
 
     try {
       if (res.type === 'note' && res.images?.length > 0) {
-        await doDownloadImages(res.images, btn);
+        await doDownloadImages(res.images, btn, res.id);
       } else if (res.type === 'video' && res.url) {
-        await doDownloadVideo(btn, res.url);
+        await doDownloadVideo(btn, res.url, res.id);
       } else {
         showToast('无效的资源链接');
         setButtonState(btn, 'error');
@@ -1233,9 +1250,9 @@
       for (let i = 0; i < resources.length; i++) {
         const res = resources[i];
         if (res.type === 'note' && res.images?.length > 0) {
-          await doDownloadImages(res.images, null);
+          await doDownloadImages(res.images, null, res.id);
         } else if (res.type === 'video' && res.url) {
-          await doDownloadVideo(null, res.url);
+          await doDownloadVideo(null, res.url, res.id);
         }
         await new Promise(r => setTimeout(r, 800));
       }
@@ -1257,7 +1274,7 @@
 
   // ==================== 内部视频与图片保存管线 ====================
 
-  async function doDownloadVideo(btn, presetUrl = null) {
+  async function doDownloadVideo(btn, presetUrl = null, mediaId = null) {
     let videoUrl = presetUrl;
 
     if (!videoUrl) {
@@ -1269,8 +1286,8 @@
     showToast('开始处理视频资源...');
     videoUrl = await cleanVideoUrl(videoUrl);
     
-    const timestamp = Date.now();
-    const filename = await buildDownloadPath('video', timestamp, 0, 'mp4');
+    const id = mediaId || getCurrentAwemeId() || Date.now();
+    const filename = await buildDownloadPath('video', id, 0, 'mp4');
     const result = await downloadDirectUrl(videoUrl, filename);
     
     if (result && result.success) {
@@ -1282,11 +1299,11 @@
     }
   }
 
-  async function doDownloadImages(images, btn) {
+  async function doDownloadImages(images, btn, mediaId = null) {
     showToast(`开始下载 ${images.length} 张原图...`);
     
     const progress = createProgress('下载图片集');
-    const timestamp = Date.now();
+    const id = mediaId || getCurrentAwemeId() || Date.now();
     let success = 0;
 
     for (let i = 0; i < images.length; i++) {
@@ -1298,7 +1315,7 @@
       // 先按 URL 猜一个扩展名，真实扩展名由响应 MIME 在保存前修正
       const m = imgUrl.split('?')[0].match(/\.(jpe?g|png|webp|gif|avif|heic)$/i);
       const ext = m ? m[1].toLowerCase().replace('jpeg', 'jpg') : 'jpg';
-      const filename = await buildDownloadPath('image', timestamp, i + 1, ext);
+      const filename = await buildDownloadPath('image', id, i + 1, ext);
 
       const result = await downloadImageFile(imgUrl, filename);
       if (result && result.success) success++;
